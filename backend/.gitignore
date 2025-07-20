@@ -1,0 +1,45 @@
+# Node modules
+node_modules/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# dotenv environment variables
+.env
+.env.test
+.env.development
+.env.production
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Editor folders and files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Output folders
+dist/
+build/
+coverage/
+
+# PM2 logs and dump files
+pids
+*.pid
+*.seed
+*.pid.lock
+pm2.log
+ecosystem.config.js
+
+# Database files
+*.sqlite
+*.sqlite3
+
+# Other
+*.tgz
