@@ -5,7 +5,7 @@ import {addComment, addnewPost, bookmarkPost, deletePost, dislikePost, getAllPos
 
 const router=Router()
 
-router.route("/addpost").post(jwtVerify, upload.single('image'), addnewPost);
+router.route("/addpost").post(jwtVerify,upload.single('image'), addnewPost);
 router.route("/all").get(jwtVerify,getAllPost);
 router.route("/userpost/all").get(jwtVerify, getUserPost);
 router.route("/:id/like").get(jwtVerify, likePost);

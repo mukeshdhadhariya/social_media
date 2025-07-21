@@ -17,10 +17,7 @@ export const addnewPost=async(req,res)=>{
             throw new ApiError(500,"image is required")
         }
 
-        const optimizedimageBuffer=await sharp(image.buffer).resize({width:800,height:800,fit:'inside'}).toFormat('jpeg',{quality:80}).toBuffer()
-        const fileUri = `data:image/jpeg;base64,${optimizedimageBuffer.toString('base64')}`;
-
-        const cloudresponce=await uploadOnCloudinary(fileUri)
+        const cloudresponce=await uploadOnCloudinary(image)
 
         const post=await Post.create({
             caption,
