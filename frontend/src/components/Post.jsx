@@ -12,7 +12,7 @@ import { FaHeart,FaRegHeart } from "react-icons/fa";
 import { Input } from 'postcss'
 import CommentDialog from './CommentDialog'
 
-function Post() {
+function Post({post}) {
 
     const [text,setText]=useState("");
 
@@ -32,16 +32,16 @@ function Post() {
         <div className='flex justify-between items-center'>
             <div className='flex gap-4 items-center'>
                 <Avatar className='w-7 h-7'>
-                <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+                <AvatarImage src={post.author.profilePicture} alt="@shadcn" />
                 <AvatarFallback>CN</AvatarFallback>
                 </Avatar>
-                <h1>username</h1>
+                <h1>{post.author.username}</h1>
             </div>
             <DialogDemo/>
         </div>
         <img
             className='rounded-sm my-2 w-full aspect-square object-cover'
-            src="https://www.thefamouspeople.com/profiles/images/maharana-pratap-4.jpg"
+            src={post.image}
             alt="post_img"
         />
         
@@ -53,10 +53,10 @@ function Post() {
             </div>
             <Bookmark className='cursor-pointer hover:text-gray-600' />
         </div>
-        <span className='font-medium block mb-2'>1k likes</span>
+        <span className='font-medium block mb-2'>{post.likes}</span>
         <p>
-            <span className='font-medium mr-2'>Mukesh dhadhariya</span>
-            caption
+            <span className='font-medium mr-2'>{post.author.username}</span>
+            {post.caption}
         </p>
         <span onClick={()=>setOpen(true)}className='cursor-pointer text-sm text-gray-400' >View all comment</span>
         <CommentDialog open={open} setOpen={setOpen}/>

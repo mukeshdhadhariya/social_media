@@ -16,13 +16,14 @@ import { setPosts } from '@/redux/postSlice';
 
 function CreatePost({open ,setOpen}) {
 
-    const user=useSelector(store=>store.auth)
+    const {user}=useSelector(store=>store.auth)
     const imageRef=useRef()
     const [file, setFile] = useState("");
     const [imagePreview, setImagePreview] = useState("");
     const [loading, setLoading] = useState(false);
     const [caption, setCaption] = useState("");
     const dispatch=useDispatch()
+    const { posts } = useSelector((store) => store.post);
 
     const fileChangeHandler = async (e) => {
         const file = e.target.files?.[0];
