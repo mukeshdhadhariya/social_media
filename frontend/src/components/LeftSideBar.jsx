@@ -10,9 +10,10 @@ import { useNavigate } from 'react-router-dom'
 import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux'
 import store from '@/redux/store'
-import { logout, setAuthUser } from '@/redux/authSlice'
+import { logout, setAuthUser, setsuggestedusers ,setuserprofile } from '@/redux/authSlice'
 import { persistor } from "@/redux/store";
 import CreatePost from './CreatePost'
+import { setPosts, setselectedPost } from '@/redux/postSlice'
 
 function LeftSideBar() {
 
@@ -46,10 +47,14 @@ const SidebarItem=[
     },
     {
         icon:(
-            <Avatar className='w-7 h-7'>
-            <AvatarImage src={user?.profilePicture} alt="@shadcn" />
-            <AvatarFallback>CN</AvatarFallback>
-            </Avatar>
+                <Avatar className="w-8 h-8" >
+                    <AvatarImage
+                        src={user?.profilePicture}
+                    />
+                    <AvatarFallback className="bg-primary text-white text-sm">
+                        {(user?.username || 'U')?.slice(0, 2).toUpperCase()}
+                    </AvatarFallback>
+                </Avatar>
         ),
         text:"Profile"
     },
@@ -71,6 +76,11 @@ const SidebarItem=[
 
             if(res.data.success){
                 dispatch(logout())
+                dispatch(setAuthUser(null))
+                dispatch(setPosts([]))
+                dispatch(setselectedPost(null))
+                dispatch(setsuggestedusers([]))
+                dispatch(setuserprofile(null))
                 persistor.purge();
                 navigate("/login")
                 toast.success(res.data.message)
@@ -85,6 +95,10 @@ const SidebarItem=[
             LogoutHandler()
         }else if(TextType=='Create'){
             setOpen(true)
+        }else if(TextType=='Profile'){
+            navigate(`/profile/${user._id}`)
+        }else if(TextType=='Home'){
+            navigate('/')
         }
     }
 

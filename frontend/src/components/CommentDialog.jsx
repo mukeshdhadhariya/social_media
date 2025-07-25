@@ -17,10 +17,25 @@ import {
 import { Link } from 'react-router-dom'
 import { MoreHorizontal } from 'lucide-react'
 import { Button } from './ui/button'
+import { useDispatch, useSelector } from 'react-redux'
+import Comment from './Comment'
+import { setPosts } from '@/redux/postSlice'
+import { useEffect } from 'react'
+import axios from 'axios'
+import { toast } from 'sonner'
 
 function CommentDialog({open,setOpen}) {
 
   const [text,setText]=useState("")
+  const {selectedPost,posts}=useSelector(store=>store.post)
+  const [comment, setComment] = useState(selectedPost?.comments);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (selectedPost) {
+      setComment(selectedPost.comments);
+    }
+  }, [selectedPost]);
 
   const changeEventHandler = (e) => {
     const inputText = e.target.value;
@@ -31,8 +46,33 @@ function CommentDialog({open,setOpen}) {
     }
   }
 
-  const sendMessageHandler=async()=>{
-    alert("hello")
+  const commmentHandler=async()=>{
+      try {
+          const res=await axios.post(`http://localhost:8000/api/v1/post/${selectedPost._id}/comment`,{text},
+              {
+              headers:{
+                  'Content-Type':'application/json'
+              },
+              withCredentials:true
+          })
+          if(res.data.success){
+
+              const updatedCommentData = [...comment, res.data.comment];
+              setComment(updatedCommentData);
+
+              const updatedPostData = posts.map(p =>
+                  p._id === selectedPost._id ? { ...p, comments: updatedCommentData } : p
+              );
+
+              dispatch(setPosts(updatedPostData));
+              setText("")
+              toast.success(res.data.message)
+          }
+      } catch (error) {
+          const errMsg =
+          error?.response?.data?.message || "Failed to post comment";
+          toast.error(errMsg);
+      }
   }
 
   return (
@@ -42,7 +82,7 @@ function CommentDialog({open,setOpen}) {
 
                   <div className='w-1/2'>
                     <img 
-                      src="https://www.thefamouspeople.com/profiles/images/maharana-pratap-4.jpg"
+                      src={selectedPost?.image}
                       alt="" 
                       className='w-full h-full object-cover rounded-l-lg'
                     />
@@ -53,12 +93,12 @@ function CommentDialog({open,setOpen}) {
                       <div className='flex gap-3 items-center'>
                         <Link>
                           <Avatar>
-                            <AvatarImage src="https://github.com/shadcn.png" />
+                            <AvatarImage src={selectedPost?.author.profilePicture} />
                             <AvatarFallback>CN</AvatarFallback>
                           </Avatar>
                         </Link>
                         <div>
-                          <Link className='font-semibold text-xs'>username</Link>
+                          <Link className='font-semibold text-xs'>{selectedPost?.author.username}</Link>
                         </div>
                        </div>
 
@@ -78,13 +118,20 @@ function CommentDialog({open,setOpen}) {
                       </div>
                       <hr />
                     <div className='flex-1 overflow-y-auto max-h-96 p-4'>
-                      yaha comment karo
+                      comment...
+                      {Array.isArray(selectedPost?.comments) && selectedPost.comments.length > 0 ? (
+                        comment.map((cmt) =>
+                          <Comment key={cmt._id} cmt={cmt}/>
+                        )
+                      ) : (
+                        <p>No posts available</p>
+                      )}
                     </div>
 
                     <div className='p-4'>
                       <div className='flex items-center gap-2'>
                         <input type="text" value={text} onChange={changeEventHandler} placeholder='Add a comment...' className='w-full outline-none border text-sm border-gray-300 p-2 rounded' />
-                        <Button disabled={!text.trim()} onClick={sendMessageHandler} variant="outline">Send</Button>
+                        <Button disabled={!text.trim()} onClick={commmentHandler} variant="outline">Send</Button>
                       </div>
                     </div>
 

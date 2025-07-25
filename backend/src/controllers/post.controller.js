@@ -1,10 +1,10 @@
-import sharp from "sharp"
 import { ApiError } from "../utils/ApiError.js"
 import { uploadOnCloudinary } from "../utils/cloudinary.js"
 import { Post } from "../models/post.model.js"
 import { User } from "../models/user.model.js"
 import { ApiResponce } from "../utils/ApiResponce.js"
 import {Comment} from "../models/comment.model.js"
+import mongoose from "mongoose"
 
 
 export const addnewPost=async(req,res)=>{
@@ -178,37 +178,37 @@ export const getCommentsOfPost = async (req,res) => {
     }
 }
 
-export const deletePost = async (req,res) => {
-    try {
-        const postId = req.params.id;
-        const authorId = req.id;
+// export const deletePost = async (req,res) => {
+//     try {
+//         const postId = req.params.id;
+//         const authorId = req.id;
 
-        const post = await Post.findById(postId);
-        if(!post) return res.status(404).json({message:'Post not found', success:false});
+//         const post = await Post.findById(postId);
+//         if(!post) return res.status(404).json({message:'Post not found', success:false});
 
    
-        if(post.author.toString() !== authorId) return res.status(403).json({message:'Unauthorized'});
+//         if(post.author.toString() !== authorId) return res.status(403).json({message:'Unauthorized'});
 
         
-        await Post.findByIdAndDelete(postId);
+//         await Post.findByIdAndDelete(postId);
 
         
-        let user = await User.findById(authorId);
-        user.posts = user.posts.filter(id => id.toString() !== postId);
-        await user.save();
+//         let user = await User.findById(authorId);
+//         user.posts = user.posts.filter(id => id.toString() !== postId);
+//         await user.save();
 
       
-        await Comment.deleteMany({post:postId});
+//         await Comment.deleteMany({post:postId});
 
-        return res.status(200).json({
-            success:true,
-            message:'Post deleted'
-        })
+//         return res.status(200).json({
+//             success:true,
+//             message:'Post deleted'
+//         })
 
-    } catch (error) {
-        console.log(error);
-    }
-}
+//     } catch (error) {
+//         console.log(error);
+//     }
+// }
 
 export const bookmarkPost = async (req,res) => {
     try {
@@ -235,4 +235,42 @@ export const bookmarkPost = async (req,res) => {
         console.log(error);
     }
 }
+
+export const deletePost = async (req, res) => {
+    try {
+        const postId = req.params.id?.trim();
+        const authorId = req.id;
+
+        if (!mongoose.Types.ObjectId.isValid(postId)) {
+            return res.status(400).json({ message: 'Invalid Post ID', success: false });
+        }
+
+        const post = await Post.findById(postId);
+        if (!post) {
+            return res.status(404).json({ message: 'Post not found', success: false });
+        }
+
+        if (post.author.toString() !== authorId.toString()) {
+            return res.status(403).json({ message: 'Unauthorized', success: false });
+        }
+
+        await Post.findByIdAndDelete(postId);
+
+        let user = await User.findById(authorId);
+        user.posts = user.posts.filter(id => id.toString() !== postId);
+        await user.save();
+
+        await Comment.deleteMany({ post: postId });
+
+        return res.status(200).json({
+            success: true,
+            message: 'Post deleted',
+        });
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ message: 'Server error', success: false });
+    }
+};
+
 

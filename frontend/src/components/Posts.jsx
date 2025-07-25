@@ -4,18 +4,16 @@ import { useSelector } from 'react-redux'
 
 function Posts() {
   const {posts}=useSelector(store=>store.post)
-  console.log(posts)
   return (
     <div>
         {Array.isArray(posts) && posts.length > 0 ? (
-          posts.map((post) =>
-            post?._id ? (
-              <Post key={post._id} post={post} />
-            ) : null
+            posts.map((post) =>
+              post?._id ? <Post key={post._id} post={post} /> : null
+            )
+          ) : (
+            <p className="text-center text-gray-500 mt-4">No posts available yet. Start by creating one!</p>
           )
-        ) : (
-          <p>No posts available</p>
-        )}
+        }
 
     </div>
   )

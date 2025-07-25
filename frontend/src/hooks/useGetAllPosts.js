@@ -1,7 +1,8 @@
 import { setPosts } from "@/redux/postSlice"
 import axios from "axios"
 import { useEffect } from "react"
-import { useDispatch } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
+
 
 const useGetAllPost=()=>{
     const dispatch=useDispatch()
@@ -12,11 +13,10 @@ const useGetAllPost=()=>{
                     withCredentials:true
                 })
                 if(res.data.success){
-                    console.log(res.data.data[0])
                     dispatch(setPosts(res.data.data))
                 }
             } catch (error) {
-                
+                console.log(error)
             }
         }
         fetchAllPost()

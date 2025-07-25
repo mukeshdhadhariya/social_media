@@ -51,7 +51,8 @@ function CreatePost({open ,setOpen}) {
             })
 
             if (res.data.success) {
-                dispatch(setPosts([res.data.post, ...posts]));
+                const updatedpost=[res.data.post, ...posts]
+                dispatch(setPosts(updatedpost));
                 toast.success(res.data.message);
                 setOpen(false);
             }

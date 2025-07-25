@@ -1,8 +1,135 @@
+import useGetuserprofile from '@/hooks/useGetuserprofile'
 import React from 'react'
+import { useSelector } from 'react-redux'
+import { useParams, Link } from 'react-router-dom'
+import { Button } from './ui/button';
+import { Badge } from './ui/badge';
+import { AtSign, Heart, MessageCircle } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
+import { useState } from 'react';
 
 function Profile() {
+  const params = useParams()
+  const userId = params.id
+  useGetuserprofile(userId)
+
+  const [activeTab, setActiveTab] = useState('posts');
+
+  const { userprofile, user } = useSelector(store => store.auth)
+  const isLoggedInuserprofile = user?._id === userprofile?._id;
+  const isFollowing = false;
+
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+  }
+
+  const displayedPost = activeTab === 'posts' ? userprofile?.posts : userprofile?.bookmarks;
+
+
   return (
-    <div>Profile</div>
+    <div className="max-w-5xl mx-auto py-10 px-4">
+      <div className="flex flex-col gap-10">
+
+        <div className="flex items-center gap-16">
+          {/* Profile Image */}
+          <div className="flex justify-center items-center w-1/3">
+            <Avatar className="h-36 w-36">
+              <AvatarImage src={userprofile?.profilePicture} alt="profilephoto" />
+              <AvatarFallback>{(userprofile?.username || 'U')?.slice(0, 2).toUpperCase()}</AvatarFallback>
+            </Avatar>
+          </div>
+
+          {/* Profile Details */}
+          <div className="flex flex-col gap-4 w-2/3">
+            {/* Username + Buttons */}
+            <div className="flex items-center gap-4">
+              <span className="text-xl font-light">{userprofile?.username}</span>
+
+              {isLoggedInuserprofile ? (
+                <>
+                  <Link to="/account/edit">
+                    <Button variant="secondary" className="h-8 text-sm px-4">Edit Profile</Button>
+                  </Link>
+                  <Button variant="secondary" className="h-8 text-sm px-4">View Archive</Button>
+                  <Button variant="secondary" className="h-8 text-sm px-4">Ad Tools</Button>
+                </>
+              ) : isFollowing ? (
+                <>
+                  <Button variant="secondary" className="h-8 text-sm px-4">Unfollow</Button>
+                  <Button variant="secondary" className="h-8 text-sm px-4">Message</Button>
+                </>
+              ) : (
+                <Button className="h-8 text-sm px-6 bg-[#0095F6] hover:bg-[#318ce7] text-white">Follow</Button>
+              )}
+            </div>
+
+            {/* Stats */}
+            <div className="flex gap-8 text-sm">
+              <span><strong>{userprofile?.posts.length}</strong> posts</span>
+              <span><strong>{userprofile?.followers.length}</strong> followers</span>
+              <span><strong>{userprofile?.following.length}</strong> following</span>
+            </div>
+
+            {/* Bio */}
+            <div className="flex flex-col gap-1 text-sm">
+              <span className="font-semibold">{userprofile?.bio || "bio here..."}</span>
+              <Badge className="w-fit" variant="secondary"><AtSign /> <span className="pl-1">{userprofile?.username}</span></Badge>
+              <span>🤯 Learn code with patel mernstack style</span>
+              <span>🤯 Turning code into fun</span>
+              <span>🤯 DM for collaboration</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="border-t border-gray-300 mt-4">
+          <div className="flex items-center justify-center gap-10 text-xs font-medium tracking-wide text-gray-600">
+            <span
+              className={`flex items-center gap-1 py-4 cursor-pointer ${activeTab === 'posts' ? 'text-black border-t-2 border-black font-semibold' : ''}`}
+              onClick={() => handleTabChange('posts')}
+            >
+              POSTS
+            </span>
+            <span
+              className={`flex items-center gap-1 py-4 cursor-pointer ${activeTab === 'saved' ? 'text-black border-t-2 border-black font-semibold' : ''}`}
+              onClick={() => handleTabChange('saved')}
+            >
+              SAVED
+            </span>
+            <span className="py-4 cursor-pointer">REELS</span>
+            <span className="py-4 cursor-pointer">TAGS</span>
+          </div>
+        </div>
+
+ 
+        <div className="grid grid-cols-3 gap-1">
+          {Array.isArray(displayedPost) &&
+            displayedPost.map((post) => (
+              <div key={post?._id} className="relative group cursor-pointer">
+                <img
+                  src={post.image}
+                  alt="postimage"
+                  className="rounded-sm w-full aspect-square object-cover"
+                />
+                <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <div className="flex items-center text-white space-x-4">
+                    <button className="flex items-center gap-2 hover:text-gray-300">
+                      <Heart />
+                      <span>{post?.likes?.length || 0}</span>
+                    </button>
+                    <button className="flex items-center gap-2 hover:text-gray-300">
+                      <MessageCircle />
+                      <span>{post?.comments?.length || 0}</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+        </div>
+
+  
+      </div>
+    </div>
+
   )
 }
 

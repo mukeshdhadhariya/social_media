@@ -6,6 +6,7 @@ import {uploadOnCloudinary} from "../utils/cloudinary.js"
 import getDataUrl  from "../utils/getDataUrl.js";
 import { Post } from "../models/post.model.js";
 
+
 export const register=async(req,res)=>{
    try {
    
@@ -138,16 +139,13 @@ export const logout=async(req,res)=>{
 export const GetProfile=async(req,res)=>{
     try {
         const userid=req.params.id
-        const user=await User.findById(userid).select("-password");
+        const user=await User.findById(userid).populate({path:'posts',createdAt:-1}).populate('bookmarks');
         return res
         .status(200)
-        .json(
-            new ApiResponce(
-                200,
-                user,
-                "fetch profile successfully"
-            )
-        )
+        .json({
+            success:true,
+            user
+        })
     } catch (error) {
         throw new ApiError(401,"Profile does not find")
     }
@@ -160,14 +158,9 @@ export const editprofile = async (req, res) => {
         const profilePicture = req.file;
         let cloudResponse;
 
-        console.log("1")
-
         if (profilePicture) {
-            const fileUri = getDataUrl(profilePicture);
-            console.log("pasaadadada")
-            cloudResponse = await uploadOnCloudinary(fileUri);
+            cloudResponse = await uploadOnCloudinary(profilePicture);
         }
-        console.log("2")
 
         const user = await User.findById(userId).select('-password');
         if (!user) {
@@ -176,13 +169,12 @@ export const editprofile = async (req, res) => {
                 success: false
             });
         };
-        console.log("3")
+
         if (bio) user.bio = bio;
         if (gender) user.gender = gender;
         if (profilePicture) user.profilePicture = cloudResponse.secure_url;
 
         await user.save();
-        console.log("4")
 
         return res.status(200).json({
             message: 'Profile updated.',
@@ -195,18 +187,16 @@ export const editprofile = async (req, res) => {
     }
 };
 
-
 export const getSuggestedUser=async(req,res)=>{
     try {
         const suggestedUser=await User.find({_id:{$ne:req.id}}).select("-password")
         if(!suggestedUser){
             throw new ApiError(401,"SuggestedUser not find")
         }
-        return res
-        .status(200)
-        .json(
-            new ApiResponce(200,suggestedUser,"use suggestion")
-        )
+        return res.status(200).json({
+            success: true,
+            users: suggestedUser
+        })
 
     } catch (error) {
         throw new ApiError(401,"getSuggestedUser not find")
