@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { Link, useNavigate } from 'react-router-dom';
 import { Loader } from 'lucide-react';
+import { useSelector } from 'react-redux';
 
 function SignUp() {
     const [input, setInput] = useState({
@@ -13,8 +14,9 @@ function SignUp() {
         password: ''
     });
 
-    const [loading ,setLoading]=useState(false)
-    const navigate=useNavigate()
+    const [loading, setLoading] = useState(false)
+    const navigate = useNavigate()
+    const {user}=useSelector(store=>store.auth)
 
     const changeEventHandler = (e) => {
         setInput({ ...input, [e.target.name]: e.target.value });
@@ -22,7 +24,7 @@ function SignUp() {
 
     const signupHandler = async (e) => {
         e.preventDefault(); // Ensure form doesn't reload
-    
+
         console.log(input);
         try {
             setLoading(true)
@@ -32,7 +34,7 @@ function SignUp() {
                 },
                 withCredentials: true
             });
-    
+
             if (res.data.success) {
                 navigate("/login")
                 toast.success(res.data.message);
@@ -45,11 +47,16 @@ function SignUp() {
         } catch (error) {
             console.log("SignUp Error:", error);
             toast.error(error.response?.data?.message || "Something went wrong");
-        }finally{
+        } finally {
             setLoading(false)
         }
     };
-    
+
+    useEffect(() => {
+        if (user) {
+            navigate("/")
+        }
+    })
 
     return (
         <div className='flex w-screen h-screen justify-center items-center'>
@@ -95,7 +102,7 @@ function SignUp() {
                         <button>
                             <Loader className='mr-2 h-4 w-4 animate-spin'></Loader>
                         </button>
-                    ):(
+                    ) : (
                         <Button type='submit'>SignUp</Button>
                     )
                 }

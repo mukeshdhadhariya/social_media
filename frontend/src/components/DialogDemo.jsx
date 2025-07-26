@@ -38,20 +38,6 @@ export function DialogDemo({ post }) {
     }
   }
   return (
-    // <Dialog open={open} onOpenChange={setOpen}>
-    //   <DialogTrigger asChild>
-    //     <MoreHorizontal className='cursor-pointer' />
-    //   </DialogTrigger>
-
-    //   <DialogContent className="flex flex-col items-center text-sm text-center">
-    //     <DialogTitle>Options</DialogTitle>
-    //     <Button variant='ghost' className="cursor-pointer w-fit text-[#ED4956] font-bold">Unfollow</Button>
-    //     <Button variant='ghost' className="cursor-pointer w-fit">Add to favorites</Button>
-    //     {
-    //       user && user?._id===post?.author._id && <Button onClick={postdeleteHandler} variant='ghost' className="cursor-pointer w-fit">Delete</Button>
-    //     }
-    //   </DialogContent>
-    // </Dialog>
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <MoreHorizontal className='cursor-pointer text-muted-foreground hover:text-foreground transition' />
@@ -59,12 +45,14 @@ export function DialogDemo({ post }) {
 
       <DialogContent className="w-full max-w-sm rounded-xl p-0 overflow-hidden">
         <div className="flex flex-col text-sm divide-y">
-          <Button
-            variant="ghost"
-            className="text-[#f93743] font-semibold py-4 hover:bg-muted/40 rounded-none"
-          >
-            Unfollow
-          </Button>
+          {user && user?._id !== post?.author._id && (
+            <Button
+              variant="ghost"
+              className="text-[#f93743] font-semibold py-4 hover:bg-muted/40 rounded-none"
+            >
+              Unfollow
+            </Button>
+          )}
 
           <Button
             variant="ghost"

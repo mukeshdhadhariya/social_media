@@ -1,12 +1,13 @@
 import { ApiError } from "../utils/ApiError.js"
 import {Conversation} from "../models/conversation.model.js"
 import {Message} from "../models/message.model.js"
+import { getReceiverSocketId, io } from "../socket/socket.js"
 
 export const sendMessage=async(req,res)=>{
     try {
         const senderId=req.id
         const receiverId = req.params.id;
-        const {message}=req.body
+        const {textMessage:message}=req.body
 
 
         let conversation = await Conversation.findOne({
@@ -31,6 +32,11 @@ export const sendMessage=async(req,res)=>{
 
 
         // some thing
+        const receiverSocketId=getReceiverSocketId(receiverId)
+
+        if(receiverSocketId){
+            io.to(receiverSocketId).emit('newMessage',newMessage)
+        }
 
         return res.status(201).json({
             success:true,

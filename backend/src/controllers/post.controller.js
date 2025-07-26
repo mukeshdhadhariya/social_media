@@ -5,6 +5,7 @@ import { User } from "../models/user.model.js"
 import { ApiResponce } from "../utils/ApiResponce.js"
 import {Comment} from "../models/comment.model.js"
 import mongoose from "mongoose"
+import { getReceiverSocketId, io } from "../socket/socket.js"
 
 
 export const addnewPost=async(req,res)=>{
@@ -96,12 +97,25 @@ export const likePost = async (req, res) => {
         const post = await Post.findById(postId);
         if (!post) return res.status(404).json({ message: 'Post not found', success: false });
 
-        // like logic started
         await post.updateOne({ $addToSet: { likes: likeKrneWalaUserKiId } });
         await post.save();
 
         // implement socket io for real time notification
-        
+        const user=await User.findById(likeKrneWalaUserKiId).select("username profilePicture")
+        const PostOwnerId=post.author.toString()
+        if(likeKrneWalaUserKiId!==PostOwnerId){
+            const notification={
+                type:'like',
+                userId:likeKrneWalaUserKiId,
+                userDetails:user,
+                postId,
+                message:'your post was liked'
+            }
+            const PostOwnerSocketId=getReceiverSocketId(PostOwnerId)
+            io.to(PostOwnerSocketId).emit('notification',notification)
+
+        }
+
         return res.status(200).json({message:'Post liked', success:true});
     } catch (error) {
 
@@ -120,6 +134,20 @@ export const dislikePost = async (req, res) => {
         await post.save();
 
         // implement socket io for real time notification
+        const user=await User.findById(likeKrneWalaUserKiId).select("username profilePicture")
+        const PostOwnerId=post.author.toString()
+        if(likeKrneWalaUserKiId!==PostOwnerId){
+            const notification={
+                type:'dislike',
+                userId:likeKrneWalaUserKiId,
+                userDetails:user,
+                postId,
+                message:'your post was disliked'
+            }
+            const PostOwnerSocketId=getReceiverSocketId(PostOwnerId)
+            io.to(PostOwnerSocketId).emit('notification',notification)
+
+        }
 
         return res.status(200).json({message:'Post disliked', success:true});
     } catch (error) {
@@ -177,38 +205,6 @@ export const getCommentsOfPost = async (req,res) => {
         console.log(error);
     }
 }
-
-// export const deletePost = async (req,res) => {
-//     try {
-//         const postId = req.params.id;
-//         const authorId = req.id;
-
-//         const post = await Post.findById(postId);
-//         if(!post) return res.status(404).json({message:'Post not found', success:false});
-
-   
-//         if(post.author.toString() !== authorId) return res.status(403).json({message:'Unauthorized'});
-
-        
-//         await Post.findByIdAndDelete(postId);
-
-        
-//         let user = await User.findById(authorId);
-//         user.posts = user.posts.filter(id => id.toString() !== postId);
-//         await user.save();
-
-      
-//         await Comment.deleteMany({post:postId});
-
-//         return res.status(200).json({
-//             success:true,
-//             message:'Post deleted'
-//         })
-
-//     } catch (error) {
-//         console.log(error);
-//     }
-// }
 
 export const bookmarkPost = async (req,res) => {
     try {

@@ -7,8 +7,10 @@ import { Badge } from './ui/badge';
 import { AtSign, Heart, MessageCircle } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
 import { useState } from 'react';
+import { getRandomColor } from '@/hooks/rendomColorGenrator';
 
 function Profile() {
+  const colorx = getRandomColor();
   const params = useParams()
   const userId = params.id
   useGetuserprofile(userId)
@@ -35,7 +37,7 @@ function Profile() {
           <div className="flex justify-center items-center w-1/3">
             <Avatar className="h-36 w-36">
               <AvatarImage src={userprofile?.profilePicture} alt="profilephoto" />
-              <AvatarFallback>{(userprofile?.username || 'U')?.slice(0, 2).toUpperCase()}</AvatarFallback>
+              <AvatarFallback style={{ backgroundColor: colorx }} >{(userprofile?.username || 'U')?.slice(0, 2).toUpperCase()}</AvatarFallback>
             </Avatar>
           </div>
 
@@ -89,18 +91,20 @@ function Profile() {
             >
               POSTS
             </span>
-            <span
-              className={`flex items-center gap-1 py-4 cursor-pointer ${activeTab === 'saved' ? 'text-black border-t-2 border-black font-semibold' : ''}`}
-              onClick={() => handleTabChange('saved')}
-            >
-              SAVED
-            </span>
+            {
+              user?._id && (userId === user?._id) && (<span
+                className={`flex items-center gap-1 py-4 cursor-pointer ${activeTab === 'saved' ? 'text-black border-t-2 border-black font-semibold' : ''}`}
+                onClick={() => handleTabChange('saved')}
+              >
+                SAVED
+              </span>)
+            }
             <span className="py-4 cursor-pointer">REELS</span>
             <span className="py-4 cursor-pointer">TAGS</span>
           </div>
         </div>
 
- 
+
         <div className="grid grid-cols-3 gap-1">
           {Array.isArray(displayedPost) &&
             displayedPost.map((post) => (
@@ -126,7 +130,7 @@ function Profile() {
             ))}
         </div>
 
-  
+
       </div>
     </div>
 

@@ -1,15 +1,13 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
     Avatar,
     AvatarFallback,
     AvatarImage,
-  } from "@/components/ui/avatar"
-import { Dialog, DialogContent, DialogTrigger } from '@radix-ui/react-dialog'
-import { Bookmark, MessageCircle, MoreHorizontal, Send } from 'lucide-react'
+} from "@/components/ui/avatar"
+import { Bookmark, MessageCircle, Send } from 'lucide-react'
 import { Button } from './ui/button'
 import { DialogDemo } from './DialogDemo'
-import { FaHeart,FaRegHeart } from "react-icons/fa";
-import { Input } from 'postcss'
+import { FaHeart, FaRegHeart } from "react-icons/fa";
 import CommentDialog from './CommentDialog'
 import { useDispatch, useSelector } from 'react-redux'
 import { toast } from 'sonner'
@@ -17,39 +15,43 @@ import axios from 'axios'
 import { setPosts, setselectedPost } from '@/redux/postSlice'
 import { Badge } from './ui/badge'
 import { Link } from 'react-router-dom'
+import { setAuthUser } from '@/redux/authSlice'
 
-function Post({post}) {
+function Post({ post }) {
 
-    const [text,setText]=useState("");
-    const {user}=useSelector(store=>store.auth)
-    const [open,setOpen]=useState(false)
-    const [liked,setliked]=useState(post.likes.includes(user?._id)|| false)
-    const [postlike,setPostlike]=useState(post.likes.length)
-    const [comments,setComments]=useState(post.comments)
-    const {posts}=useSelector((store)=>store.post)
-    const dispatch=useDispatch()
+    const [text, setText] = useState("");
+    const { user } = useSelector(store => store.auth)
+    const [open, setOpen] = useState(false)
+    const [liked, setliked] = useState(post.likes.includes(user?._id) || false)
+    const [postlike, setPostlike] = useState(post.likes.length)
+    const [comments, setComments] = useState(post.comments)
+    const { posts } = useSelector((store) => store.post)
+    const dispatch = useDispatch()
+    const [isBookmarked, setIsBookmarked] = useState(
+        user?.bookmarks?.some((pst) => String(pst) === String(post._id))
+    );
 
-    const changeEventHandler=(e)=>{
-        const inputText=e.target.value
-        if(inputText.trim()){
+    const changeEventHandler = (e) => {
+        const inputText = e.target.value
+        if (inputText.trim()) {
             setText(inputText)
-        }else{
+        } else {
             setText("")
         }
     }
 
-    const likeOrdislikeHandler=async()=>{
+    const likeOrdislikeHandler = async () => {
         try {
-            const action=liked? 'dislike' : 'like'
-            const res=await axios.get(`http://localhost:8000/api/v1/post/${post._id}/${action}`,{withCredentials:true})
-            if(res.data.success){
-                const updatedlike=liked ? postlike-1 : postlike+1
+            const action = liked ? 'dislike' : 'like'
+            const res = await axios.get(`http://localhost:8000/api/v1/post/${post._id}/${action}`, { withCredentials: true })
+            if (res.data.success) {
+                const updatedlike = liked ? postlike - 1 : postlike + 1
                 setPostlike(updatedlike)
                 setliked(!liked)
-                const updatedpostdata=posts.map(p=>
-                    p._id===post._id ? {
+                const updatedpostdata = posts.map(p =>
+                    p._id === post._id ? {
                         ...p,
-                        likes : liked ? p.likes.filter(id=>id!==user._id) : [...p.likes,user._id]
+                        likes: liked ? p.likes.filter(id => id !== user._id) : [...p.likes, user._id]
                     } : p
                 )
                 dispatch(setPosts(updatedpostdata));
@@ -60,16 +62,16 @@ function Post({post}) {
         }
     }
 
-    const commmentHandler=async()=>{
+    const commmentHandler = async () => {
         try {
-            const res=await axios.post(`http://localhost:8000/api/v1/post/${post._id}/comment`,{text},
+            const res = await axios.post(`http://localhost:8000/api/v1/post/${post._id}/comment`, { text },
                 {
-                headers:{
-                    'Content-Type':'application/json'
-                },
-                withCredentials:true
-            })
-            if(res.data.success){
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    withCredentials: true
+                })
+            if (res.data.success) {
 
                 const updatedCommentData = [...comments, res.data.comment];
                 setComments(updatedCommentData);
@@ -84,86 +86,108 @@ function Post({post}) {
             }
         } catch (error) {
             const errMsg =
-            error?.response?.data?.message || "Failed to post comment";
+                error?.response?.data?.message || "Failed to post comment";
             toast.error(errMsg);
         }
     }
 
-  return (
-    <div className='my-8 w-full mx-auto max-w-sm '>
+    const bookmarkHandler = async () => {
+        try {
+            const res = await axios.get(`http://localhost:8000/api/v1/post/${post?._id}/bookmark`, { withCredentials: true })
+            if (res.data.success) {
+                toast.success(res.data.message)
+                const updatedBookmarks = isBookmarked
+                    ? user.bookmarks.filter(id => String(id) !== String(post._id))
+                    : [...user.bookmarks, post._id];
 
-        <div className="flex justify-between items-center px-2 py-2">
-            <div className="flex items-center gap-3">
-              <Link to={`/profile/${post?.author?._id}`}>
-                <Avatar className="w-9 h-9 ring-2 ring-primary/50">
-                    <AvatarImage
-                        src={post?.author?.profilePicture}
-                        alt={post?.author?.username}
-                    />
-                    <AvatarFallback className="bg-primary text-white text-sm">
-                        {(post?.author?.username || 'U')?.slice(0, 2).toUpperCase()}
-                    </AvatarFallback>
-                </Avatar>
-                </Link>
-                <div className='flex items-center gap-3'>
-                <Link to={`/profile/${post?.author?._id}`}><h1 className="text-sm font-medium cursor-pointer">{post.author?.username}</h1></Link>
-                {user?._id === post.author._id && (
-                    <Badge  className="text-xs px-1 py-0.5 h-auto">Author</Badge>
-                )}
+                dispatch(setAuthUser({
+                    ...user,
+                    bookmarks: updatedBookmarks,
+                }));
+
+                setIsBookmarked(!isBookmarked);
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    return (
+        <div className='my-8 w-full mx-auto max-w-sm '>
+
+            <div className="flex justify-between items-center px-2 py-2">
+                <div className="flex items-center gap-3">
+                    <Link to={`/profile/${post?.author?._id}`}>
+                        <Avatar className="w-9 h-9 ring-2 ring-primary/50">
+                            <AvatarImage
+                                src={post?.author?.profilePicture}
+                                alt={post?.author?.username}
+                            />
+                            <AvatarFallback className="bg-primary text-white text-sm">
+                                {(post?.author?.username || 'U')?.slice(0, 2).toUpperCase()}
+                            </AvatarFallback>
+                        </Avatar>
+                    </Link>
+                    <div className='flex items-center gap-3'>
+                        <Link to={`/profile/${post?.author?._id}`}><h1 className="text-sm font-medium cursor-pointer">{post.author?.username}</h1></Link>
+                        {user?._id === post.author._id && (
+                            <Badge className="text-xs px-1 py-0.5 h-auto">Author</Badge>
+                        )}
+                    </div>
+
                 </div>
-
+                <DialogDemo post={post} />
             </div>
-            <DialogDemo post={post} />
-        </div>
 
-        <img
-            className='rounded-sm my-2 w-full aspect-square object-cover'
-            src={post.image}
-            alt="post_img"
-        />
-        
-        <div className='flex items-center justify-between my-2'>
-            <div className='flex items-center gap-3'>
-                {
-                    liked ? <FaHeart onClick={likeOrdislikeHandler} size={'24px'} className='cursor-pointer text-red-600'/> : <FaRegHeart onClick={likeOrdislikeHandler} size={'24px'} className='cursor-pointer hover:text-gray-600'/>
-                }
+            <img
+                className='rounded-sm my-2 w-full aspect-square object-cover'
+                src={post.image}
+                alt="post_img"
+            />
 
-                <MessageCircle onClick={()=>{
-                    dispatch(setselectedPost(post)) 
-                    setOpen(true) 
+            <div className='flex items-center justify-between my-2'>
+                <div className='flex items-center gap-3'>
+                    {
+                        liked ? <FaHeart onClick={likeOrdislikeHandler} size={'24px'} className='cursor-pointer text-red-600' /> : <FaRegHeart onClick={likeOrdislikeHandler} size={'24px'} className='cursor-pointer hover:text-gray-600' />
+                    }
+
+                    <MessageCircle onClick={() => {
+                        dispatch(setselectedPost(post))
+                        setOpen(true)
                     }} className='cursor-pointer hover:text-gray-600' />
 
-                <Send className='cursor-pointer hover:text-gray-600'/>
+                    <Send className='cursor-pointer hover:text-gray-600' />
+                </div>
+                <Bookmark onClick={bookmarkHandler} className={`cursor-pointer transition-colors duration-200 ${isBookmarked ? 'text-gray-800 fill-gray-800' : 'text-gray-600'
+                    }`} />
             </div>
-            <Bookmark className='cursor-pointer hover:text-gray-600' />
-        </div>
-        <span className='font-medium block mb-2'>{postlike} likes</span>
-        <p>
-            <span className='font-medium mr-2'>{post.author.username}</span>
-            {post.caption}
-        </p>
-        {
-            comments.length>0 && <span  onClick={()=>{
-                            dispatch(setselectedPost(post)) 
-                            setOpen(true) 
-                        }} className='cursor-pointer text-sm text-gray-400' >View all {comments.length} comment</span>
-        }
-        <CommentDialog open={open} setOpen={setOpen} />
-        <div className='flex items-center justify-between'>
-            <input
-            type="text"
-            value={text}
-            onChange={changeEventHandler}
-            placeholder="Add a comment..."
-            className='outline-none text-sm w-full bg-slate-100 rounded-md px-2'
-            />
+            <span className='font-medium block mb-2'>{postlike} likes</span>
+            <p>
+                <span className='font-medium mr-2'>{post.author.username}</span>
+                {post.caption}
+            </p>
             {
-                text && <span onClick={commmentHandler} className='text-[#3BADF8] cursor-pointer'>Post</span>
+                comments.length > 0 && <span onClick={() => {
+                    dispatch(setselectedPost(post))
+                    setOpen(true)
+                }} className='cursor-pointer text-sm text-gray-400' >View all {comments.length} comment</span>
             }
-        </div>
+            <CommentDialog open={open} setOpen={setOpen} />
+            <div className='flex items-center justify-between'>
+                <input
+                    type="text"
+                    value={text}
+                    onChange={changeEventHandler}
+                    placeholder="Add a comment..."
+                    className='outline-none text-sm w-full bg-slate-100 rounded-md px-2'
+                />
+                {
+                    text && <span onClick={commmentHandler} className='text-[#3BADF8] cursor-pointer'>Post</span>
+                }
+            </div>
 
-    </div>
-  )
+        </div>
+    )
 }
 
 export default Post

@@ -74,10 +74,17 @@ export const login=async(req,res)=>{
         const populatedPosts = await Promise.all(
             user.posts.map( async (postId) => {
                 const post = await Post.findById(postId);
-                if(post.author.equals(user._id)){
-                    return post;
-                }
-                return null;
+                // if(post.author.equals(user._id)){
+                //     return post;
+                // }
+                return post;
+            })
+        )
+
+        const bookmarksp=await Promise.all(
+            user.bookmarks.map(async(postid)=>{
+                const post = await Post.findById(postid);
+                return post;
             })
         )
         user = {
@@ -88,7 +95,8 @@ export const login=async(req,res)=>{
             bio: user.bio,
             followers: user.followers,
             following: user.following,
-            posts: populatedPosts
+            posts: populatedPosts,
+            bookmarks:bookmarksp
         }
         
 

@@ -1,32 +1,33 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { Link, useNavigate } from 'react-router-dom';
 import { Loader } from 'lucide-react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { setAuthUser } from '../redux/authSlice';
 
 function Login() {
 
-    const dispatch=useDispatch();
+    const dispatch = useDispatch();
+    const { user } = useSelector(store => store.auth)
 
     const [input, setInput] = useState({
         email: '',
         password: ''
     });
 
-    const [loading ,setLoading]=useState(false)
-    const navigate=useNavigate()
+    const [loading, setLoading] = useState(false)
+    const navigate = useNavigate()
 
     const changeEventHandler = (e) => {
         setInput({ ...input, [e.target.name]: e.target.value });
     };
 
     const signupHandler = async (e) => {
-        e.preventDefault(); 
-    
+        e.preventDefault();
+
         try {
             setLoading(true)
             const res = await axios.post('http://localhost:8000/api/v1/user/login', input, {
@@ -35,7 +36,7 @@ function Login() {
                 },
                 withCredentials: true
             });
-    
+
             if (res.data.success) {
                 dispatch(setAuthUser(res.data.user))
                 navigate("/")
@@ -48,11 +49,17 @@ function Login() {
         } catch (error) {
             console.log("Login Error:", error);
             toast.error(error.response?.data?.message || "Something went wrong");
-        }finally{
+        } finally {
             setLoading(false)
         }
     };
-    
+
+    useEffect(() => {
+        if (user) {
+            navigate("/")
+        }
+    })
+
 
     return (
         <div className='flex w-screen h-screen justify-center items-center'>
@@ -61,7 +68,7 @@ function Login() {
                     <h1 className='text-center font-bold text-xl'>Logo</h1>
                     <p className='text-sm text-center'>See photos of your friend</p>
                 </div>
-                
+
                 <div>
                     <span className='font-medium'>Email</span>
                     <Input
@@ -88,11 +95,11 @@ function Login() {
                         <button>
                             <Loader className='mr-2 h-4 w-4 animate-spin'></Loader>
                         </button>
-                    ):(
+                    ) : (
                         <Button type='submit'>Login</Button>
                     )
                 }
-               
+
                 <span className='text-center'>Don`t have an account ?<Link to='/signup' className='text-blue-600'>SignUp</Link></span>
             </form>
         </div>
