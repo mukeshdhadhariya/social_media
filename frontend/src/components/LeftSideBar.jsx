@@ -20,7 +20,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@radix-ui/react-popover
 function LeftSideBar() {
 
     const { user } = useSelector(store => store.auth)
-    const { likenotification } = useSelector(store => store.rtn)
+    const { likenotification, follownotification } = useSelector(store => store.rtn)
     const [open, setOpen] = useState(false)
 
     const SidebarItem = [
@@ -87,7 +87,7 @@ function LeftSideBar() {
                 dispatch(setselectedPost(null))
                 dispatch(setsuggestedusers([]))
                 dispatch(setuserprofile(null))
-                // persistor.purge();
+                persistor.purge();
                 navigate("/login")
                 toast.success(res.data.message)
             }
@@ -125,13 +125,13 @@ function LeftSideBar() {
                                         item.text === 'Notification' && likenotification.length > 0 && (
                                             <Popover>
                                                 <PopoverTrigger asChild>
-                                                    <Button size='icon' className="rounded-full h-5 w-5 bg-red-600 hover:bg-red-600 absolute bottom-6 left-6">{likenotification.length}</Button>
+                                                    <Button size='icon' className="rounded-full h-5 w-5 bg-red-600 hover:bg-red-600 absolute bottom-6 left-6">{likenotification.length + follownotification.length}</Button>
                                                 </PopoverTrigger>
                                                 <PopoverContent>
                                                     <div>
                                                         {
                                                             likenotification.length === 0 ? (<p>No notifications</p>) : (
-                                                                likenotification.map((notification) => {
+                                                                likenotification.filter(notification => notification.userId !== notification.userDetails._id).map((notification) => {
                                                                     return (
                                                                         <div
                                                                             key={notification.userId}
@@ -147,6 +147,31 @@ function LeftSideBar() {
                                                                                 <span className="text-sm text-gray-800 dark:text-gray-200">
                                                                                     <span className="font-semibold">{notification.userDetails?.username}</span>{" "}
                                                                                     <span className="text-gray-600 dark:text-gray-400">liked your post</span>
+                                                                                </span>
+                                                                                <span className="text-xs text-gray-400">Just now</span>
+                                                                            </div>
+                                                                        </div>
+
+                                                                    )
+                                                                })
+                                                            ) }{
+                                                            follownotification.length === 0 ? (<p></p>) : (
+                                                                follownotification.map((notification) => {
+                                                                    return (
+                                                                        <div
+                                                                            key={notification.senderId}
+                                                                            className="flex items-center gap-4 p-3 rounded-lg bg-gray-50 dark:bg-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-700 transition duration-200 shadow-sm"
+                                                                        >
+                                                                            <Avatar className="w-10 h-10 ring-2 ring-primary/20">
+                                                                                <AvatarImage src={notification.SenderDetails?.profilePicture} />
+                                                                                <AvatarFallback className="text-xs bg-primary text-white">
+                                                                                    {(notification.SenderDetails?.username || 'U')?.slice(0, 2).toUpperCase()}
+                                                                                </AvatarFallback>
+                                                                            </Avatar>
+                                                                            <div className="flex flex-col">
+                                                                                <span className="text-sm text-gray-800 dark:text-gray-200">
+                                                                                    <span className="font-semibold">{notification.SenderDetails?.username}</span>{" "}
+                                                                                    <span className="text-gray-600 dark:text-gray-400">starting following you</span>
                                                                                 </span>
                                                                                 <span className="text-xs text-gray-400">Just now</span>
                                                                             </div>

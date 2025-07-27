@@ -5,6 +5,7 @@ import bcrypt from "bcryptjs"
 import {uploadOnCloudinary} from "../utils/cloudinary.js"
 import getDataUrl  from "../utils/getDataUrl.js";
 import { Post } from "../models/post.model.js";
+import { getReceiverSocketId ,io} from "../socket/socket.js";
 
 
 export const register=async(req,res)=>{
@@ -213,8 +214,9 @@ export const getSuggestedUser=async(req,res)=>{
 
 export const followOrUnfollow = async (req, res) => {
     try {
-        const followKrneWala = req.id; // patel
-        const jiskoFollowKrunga = req.params.id; // shivani
+        const followKrneWala = req.id; 
+        const jiskoFollowKrunga = req.params.id; 
+
         if (followKrneWala === jiskoFollowKrunga) {
             return res.status(400).json({
                 message: 'You cannot follow/unfollow yourself',
@@ -231,21 +233,39 @@ export const followOrUnfollow = async (req, res) => {
                 success: false
             });
         }
-        // mai check krunga ki follow krna hai ya unfollow
+
         const isFollowing = user.following.includes(jiskoFollowKrunga);
         if (isFollowing) {
-            // unfollow logic ayega
             await Promise.all([
                 User.updateOne({ _id: followKrneWala }, { $pull: { following: jiskoFollowKrunga } }),
                 User.updateOne({ _id: jiskoFollowKrunga }, { $pull: { followers: followKrneWala } }),
             ])
+
+            const follownotification={
+                type:'follow',
+                senderId:followKrneWala,
+                SenderDetails:user,
+                message:'started following you'
+            }
+            const ReciverSocketID=getReceiverSocketId(jiskoFollowKrunga)
+            io.to(ReciverSocketID).emit('follownotification',follownotification)
+
             return res.status(200).json({ message: 'Unfollowed successfully', success: true });
         } else {
-            // follow logic ayega
             await Promise.all([
                 User.updateOne({ _id: followKrneWala }, { $push: { following: jiskoFollowKrunga } }),
                 User.updateOne({ _id: jiskoFollowKrunga }, { $push: { followers: followKrneWala } }),
             ])
+
+            const follownotification={
+                type:'unfollow',
+                senderId:followKrneWala,
+                SenderDetails:user,
+                message:'unfollow you'
+            }
+            const ReciverSocketID=getReceiverSocketId(jiskoFollowKrunga)
+            io.to(ReciverSocketID).emit('follownotification',follownotification)
+
             return res.status(200).json({ message: 'followed successfully', success: true });
         }
     } catch (error) {

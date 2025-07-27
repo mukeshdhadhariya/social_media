@@ -12,7 +12,7 @@ import { setOnlineUsers } from "./redux/chatSlice.js"
 import { useSelector } from "react-redux"
 import { useEffect } from "react"
 import { io } from "socket.io-client"
-import { setLikenotification } from "./redux/rtnSlice.js"
+import { setFollownotification, setLikenotification } from "./redux/rtnSlice.js"
 import ProtectedRoute from "./components/ProtectedRoute.jsx"
 
 const broserRouter = createBrowserRouter([
@@ -65,6 +65,10 @@ function App() {
 
       socketio.on('notification',(notification)=>{
         dispatch(setLikenotification(notification))
+      })
+
+      socketio.on('follownotification',(follownotification)=>{
+        dispatch(setFollownotification(follownotification))
       })
 
 

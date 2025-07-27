@@ -1,6 +1,6 @@
 import useGetuserprofile from '@/hooks/useGetuserprofile'
 import React from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useParams, Link } from 'react-router-dom'
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
@@ -8,6 +8,9 @@ import { AtSign, Heart, MessageCircle } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
 import { useState } from 'react';
 import { getRandomColor } from '@/hooks/rendomColorGenrator';
+import { toast } from 'sonner';
+import axios from 'axios';
+import { setAuthUser, setuserprofile } from '@/redux/authSlice';
 
 function Profile() {
   const colorx = getRandomColor();
@@ -15,17 +18,90 @@ function Profile() {
   const userId = params.id
   useGetuserprofile(userId)
 
+  const dispatch = useDispatch()
+
   const [activeTab, setActiveTab] = useState('posts');
 
   const { userprofile, user } = useSelector(store => store.auth)
   const isLoggedInuserprofile = user?._id === userprofile?._id;
-  const isFollowing = false;
+
+  const [isFollowing, setIsfollowing] = useState(user?.following?.some(id => id.toString() === userId.toString()))
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);
   }
 
   const displayedPost = activeTab === 'posts' ? userprofile?.posts : userprofile?.bookmarks;
+
+
+  // const FollowUnfollowHandler = async () => {
+  //   try {
+  //     const res = await axios.post(`http://localhost:8000/api/v1/user/followorunfollow/${userId}`, {}, {
+  //       withCredentials: true
+  //     })
+
+  //     if (res.data.success) {
+  //       toast.success(res.data.message)
+  //       dispatch(setAuthUser({
+  //         ...user,
+  //         following: isFollowing
+  //           ? user.following.filter(id => String(id) !== String(userId))
+  //           : [...user.following, userId]
+  //       }));
+
+  //       const updatedFollowers = isFollowing
+  //         ? userprofile.followers.filter(id => String(id) !== String(user._id))
+  //         : [...userprofile.followers, user._id];
+
+  //       dispatch(setuserprofile({
+  //         ...userprofile,
+  //         followers: updatedFollowers
+  //       }));
+
+  //       setIsfollowing(!isFollowing)
+  //     }
+  //   } catch (error) {
+  //     toast.error("follow unfollow error ")
+  //   }
+  // }
+
+  const FollowUnfollowHandler = async () => {
+    try {
+      const res = await axios.post(
+        `http://localhost:8000/api/v1/user/followorunfollow/${userId}`,
+        {},
+        { withCredentials: true }
+      );
+
+      if (res.data.success) {
+        toast.success(res.data.message);
+
+        const updatedFollowing = isFollowing
+          ? user.following.filter(id => id !== userId)
+          : [...user.following, userId];
+
+        dispatch(setAuthUser({
+          ...user,
+          following: updatedFollowing
+        }));
+
+        // Important: deep clone userprofile so Redux triggers a re-render
+        const updatedUserProfile = {
+          ...userprofile,
+          followers: isFollowing
+            ? userprofile.followers.filter(id => id !== user._id)
+            : [...userprofile.followers, user._id],
+        };
+
+        dispatch(setuserprofile(updatedUserProfile));
+        setIsfollowing(!isFollowing);
+      }
+    } catch (error) {
+      console.error("Follow/unfollow error", error);
+      toast.error("Follow/unfollow error");
+    }
+  };
+
 
 
   return (
@@ -57,11 +133,11 @@ function Profile() {
                 </>
               ) : isFollowing ? (
                 <>
-                  <Button variant="secondary" className="h-8 text-sm px-4">Unfollow</Button>
+                  <Button onClick={FollowUnfollowHandler} variant="secondary" className="h-8 text-sm px-4">Unfollow</Button>
                   <Button variant="secondary" className="h-8 text-sm px-4">Message</Button>
                 </>
               ) : (
-                <Button className="h-8 text-sm px-6 bg-[#0095F6] hover:bg-[#318ce7] text-white">Follow</Button>
+                <Button onClick={FollowUnfollowHandler} className="h-8 text-sm px-6 bg-[#0095F6] hover:bg-[#318ce7] text-white">Follow</Button>
               )}
             </div>
 
