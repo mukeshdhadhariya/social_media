@@ -10,7 +10,7 @@ import { getRandomColor } from '@/hooks/rendomColorGenrator';
 import { toast } from 'sonner';
 import axios from 'axios';
 import { setAuthUser, setuserprofile } from '@/redux/authSlice';
-import useGetUserProfile from '@/hooks/useGetuserprofile';
+import useGetUserProfile from '@/hooks/useGetuserProfile';
 
 function Profile() {
   const colorx = getRandomColor();
