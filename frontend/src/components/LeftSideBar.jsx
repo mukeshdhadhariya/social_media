@@ -22,6 +22,7 @@ function LeftSideBar() {
     const { user } = useSelector(store => store.auth)
     const { likenotification, follownotification } = useSelector(store => store.rtn)
     const [open, setOpen] = useState(false)
+    const API_URL=import.meta.env.VITE_API_URL
 
     const SidebarItem = [
         {
@@ -73,7 +74,7 @@ function LeftSideBar() {
     const LogoutHandler = async () => {
 
         try {
-            const res = await axios.get('http://localhost:8000/api/v1/user/logout', {
+            const res = await axios.get(`${API_URL}/api/v1/user/logout`, {
                 withCredentials: true
             });
 

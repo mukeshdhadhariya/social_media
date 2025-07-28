@@ -48,10 +48,11 @@ function App() {
   const { user } = useSelector(store => store.auth);
   const { socket } = useSelector(store => store.socketio);
   const dispatch = useDispatch();
+  const API_URL=import.meta.env.VITE_API_URL
 
   useEffect(() => {
     if (user) {
-      const socketio = io('http://localhost:8000', {
+      const socketio = io(`${API_URL}`, {
         query: {
           userId: user?._id
         },

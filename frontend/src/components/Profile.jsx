@@ -24,8 +24,9 @@ function Profile() {
 
   const { userprofile, user } = useSelector(store => store.auth)
   const isLoggedInuserprofile = user?._id === userprofile?._id;
-
   const [isFollowing, setIsfollowing] = useState(user?.following?.some(id => id.toString() === userId.toString()))
+  const API_URL=import.meta.env.VITE_API_URL
+  
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);
@@ -68,7 +69,7 @@ function Profile() {
   const FollowUnfollowHandler = async () => {
     try {
       const res = await axios.post(
-        `http://localhost:8000/api/v1/user/followorunfollow/${userId}`,
+        `${API_URL}/api/v1/user/followorunfollow/${userId}`,
         {},
         { withCredentials: true }
       );

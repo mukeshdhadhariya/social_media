@@ -17,6 +17,7 @@ function SignUp() {
     const [loading, setLoading] = useState(false)
     const navigate = useNavigate()
     const { user } = useSelector(store => store.auth)
+    const API_URL=import.meta.env.VITE_API_URL
 
     const changeEventHandler = (e) => {
         setInput({ ...input, [e.target.name]: e.target.value });
@@ -28,7 +29,7 @@ function SignUp() {
         console.log(input);
         try {
             setLoading(true)
-            const res = await axios.post('http://localhost:8000/api/v1/user/register', input, {
+            const res = await axios.post(`${API_URL}/api/v1/user/register`, input, {
                 headers: {
                     'Content-Type': 'application/json'
                 },

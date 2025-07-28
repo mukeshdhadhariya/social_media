@@ -27,6 +27,7 @@ function Post({ post }) {
     const [comments, setComments] = useState(post.comments)
     const { posts } = useSelector((store) => store.post)
     const dispatch = useDispatch()
+    const API_URL=import.meta.env.VITE_API_URL
     const [isBookmarked, setIsBookmarked] = useState(
         user?.bookmarks?.some((pst) => String(pst) === String(post._id))
     );
@@ -43,7 +44,7 @@ function Post({ post }) {
     const likeOrdislikeHandler = async () => {
         try {
             const action = liked ? 'dislike' : 'like'
-            const res = await axios.get(`http://localhost:8000/api/v1/post/${post._id}/${action}`, { withCredentials: true })
+            const res = await axios.get(`${API_URL}/api/v1/post/${post._id}/${action}`, { withCredentials: true })
             if (res.data.success) {
                 const updatedlike = liked ? postlike - 1 : postlike + 1
                 setPostlike(updatedlike)
@@ -64,7 +65,7 @@ function Post({ post }) {
 
     const commmentHandler = async () => {
         try {
-            const res = await axios.post(`http://localhost:8000/api/v1/post/${post._id}/comment`, { text },
+            const res = await axios.post(`${API_URL}/api/v1/post/${post._id}/comment`, { text },
                 {
                     headers: {
                         'Content-Type': 'application/json'
@@ -93,7 +94,7 @@ function Post({ post }) {
 
     const bookmarkHandler = async () => {
         try {
-            const res = await axios.get(`http://localhost:8000/api/v1/post/${post?._id}/bookmark`, { withCredentials: true })
+            const res = await axios.get(`${API_URL}/api/v1/post/${post?._id}/bookmark`, { withCredentials: true })
             if (res.data.success) {
                 toast.success(res.data.message)
                 const updatedBookmarks = isBookmarked

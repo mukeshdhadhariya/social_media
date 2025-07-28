@@ -23,10 +23,11 @@ export function DialogDemo({ post }) {
   const [open, setOpen] = useState(false);
   const dispatch = useDispatch()
   const { posts } = useSelector(store => store.post)
+  const API_URL=import.meta.env.VITE_API_URL
 
   const postdeleteHandler = async () => {
     try {
-      const res = await axios.delete(`http://localhost:8000/api/v1/post/delete/${post._id}`, { withCredentials: true })
+      const res = await axios.delete(`${API_URL}/api/v1/post/delete/${post._id}`, { withCredentials: true })
       if (res.data.success) {
         const updatedpost = posts.filter((postitem) => postitem?._id !== post?._id)
         dispatch(setPosts(updatedpost))

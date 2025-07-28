@@ -21,6 +21,7 @@ const EditProfile = () => {
   });
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const API_URL=import.meta.env.VITE_API_URL
 
   const fileChangeHandler = (e) => {
     const file = e.target.files?.[0];
@@ -40,7 +41,7 @@ const EditProfile = () => {
     }
     try {
       setLoading(true);
-      const res = await axios.post('http://localhost:8000/api/v1/user/profile/edit', formData, {
+      const res = await axios.post(`${API_URL}/api/v1/user/profile/edit`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         },
