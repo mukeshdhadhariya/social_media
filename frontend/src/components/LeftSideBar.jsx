@@ -131,7 +131,7 @@ function LeftSideBar() {
                                                     <div>
                                                         {
                                                             likenotification.length === 0 ? (<p>No notifications</p>) : (
-                                                                likenotification.filter(notification => notification.userId !== notification.userDetails._id).map((notification) => {
+                                                                likenotification.map((notification) => {
                                                                     return (
                                                                         <div
                                                                             key={notification.userId}
