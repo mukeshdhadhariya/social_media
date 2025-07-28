@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 
 
-const useGetUserProfile = (userId) => {
+const useGetUserprofile = (userId) => {
     const dispatch = useDispatch();
     const API_URL=import.meta.env.VITE_API_URL
     useEffect(() => {
@@ -21,4 +21,4 @@ const useGetUserProfile = (userId) => {
         fetchUsersprofile();
     }, [userId]);
 };
-export default useGetUserProfile;
+export default useGetUserprofile;
