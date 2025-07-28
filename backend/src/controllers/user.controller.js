@@ -59,12 +59,17 @@ export const login=async(req,res)=>{
         }
 
         let user=await User.findOne({email})
+        console.log("Email from req.body:", email);
+console.log("User found:", user);
+
+ 
 
         if(!user){
             throw new ApiError(401,"User does not exist")
         }
 
         const isPaswordCorrect=await bcrypt.compare(password,user.password)
+        console.log("Password match:", isPaswordCorrect);
 
         if(!isPaswordCorrect){
             throw new ApiError(401,"password incorrect")

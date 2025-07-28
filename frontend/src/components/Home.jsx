@@ -4,17 +4,21 @@ import { Outlet } from 'react-router-dom'
 import RightSideBar from './RightSideBar'
 import useGetAllPost from '@/hooks/useGetAllPosts'
 import useGetAllSuggestedUser from '@/hooks/useGetAllSuggestedUsers'
+import { useSelector } from 'react-redux'
 
 function Home() {
-  useGetAllPost()
-  useGetAllSuggestedUser()
+  const { user } = useSelector(store => store.auth)
+  if (user) {
+    useGetAllPost()
+    useGetAllSuggestedUser()
+  }
   return (
     <div className='flex'>
-       <div className='flex-grow'>
-        <Feed/>
+      <div className='flex-grow'>
+        <Feed />
         <Outlet></Outlet>
       </div>
-      <RightSideBar/>
+      <RightSideBar />
     </div>
   )
 }
