@@ -1,4 +1,3 @@
-import useGetuserprofile from '@/hooks/useGetuserprofile'
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams, Link } from 'react-router-dom'
@@ -11,12 +10,13 @@ import { getRandomColor } from '@/hooks/rendomColorGenrator';
 import { toast } from 'sonner';
 import axios from 'axios';
 import { setAuthUser, setuserprofile } from '@/redux/authSlice';
+import useGetUserProfile from '@/hooks/useGetuserprofile';
 
 function Profile() {
   const colorx = getRandomColor();
   const params = useParams()
   const userId = params.id
-  useGetuserprofile(userId)
+  useGetUserProfile(userId)
 
   const dispatch = useDispatch()
 
