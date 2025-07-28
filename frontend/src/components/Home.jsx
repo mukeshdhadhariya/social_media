@@ -7,11 +7,11 @@ import useGetAllSuggestedUser from '@/hooks/useGetAllSuggestedUsers'
 import { useSelector } from 'react-redux'
 
 function Home() {
-  const { user } = useSelector(store => store.auth)
-  if (user) {
+  // const { user } = useSelector(store => store.auth)
+  // if (user) {
     useGetAllPost()
     useGetAllSuggestedUser()
-  }
+  // }
   return (
     <div className='flex'>
       <div className='flex-grow'>

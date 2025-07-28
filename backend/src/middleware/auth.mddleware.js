@@ -5,7 +5,6 @@ import { User } from "../models/user.model.js"
 const jwtVerify=async(req,res,next)=>{
     try {
         const token=req.cookies?.token || req.header("Authorization")?.replace("Bearer ","")
-        
     
         if(!token){
             throw new ApiError(401,"Unauthorized request")
@@ -16,7 +15,7 @@ const jwtVerify=async(req,res,next)=>{
         const user=await User.findById(decodedtoken?._id).select(
             "-password"
         )
-    
+
         if(!user){
             throw new ApiError(401,"invalid access token")
         }
@@ -24,7 +23,7 @@ const jwtVerify=async(req,res,next)=>{
         req.id=user._id
         next()
     }catch (error) {
-        throw new ApiError(401,"invalid accessToken")
+        return res.status(401).json({ success: false, message: "Invalid access token" });
     }
 }
 
