@@ -37,10 +37,9 @@ function Login() {
                 },
                 withCredentials: true
             });
-
+            
             if (res.data.success) {
                 dispatch(setAuthUser(res.data.user))
-                console.log('user',user)
                 navigate("/")
                 toast.success(res.data.message);
                 setInput({
@@ -64,47 +63,6 @@ function Login() {
 
 
     return (
-        // <div className='flex w-screen h-screen justify-center items-center'>
-        //     <form onSubmit={signupHandler} className='flex flex-col shadow-lg gap-5 p-8 w-96 bg-slate-50'>
-        //         <div className='my-4'>
-        //             <h1 className='text-center font-bold text-xl'>Logo</h1>
-        //             <p className='text-sm text-center'>See photos of your friend</p>
-        //         </div>
-
-        //         <div>
-        //             <span className='font-medium'>Email</span>
-        //             <Input
-        //                 type='email'
-        //                 name='email'
-        //                 value={input.email}
-        //                 onChange={changeEventHandler}
-        //                 className='focus-visible:ring-transparent my-2'
-        //             />
-        //         </div>
-        //         <div>
-        //             <span className='font-medium'>Password</span>
-        //             <Input
-        //                 type='password'  // Fixed type case
-        //                 name='password'
-        //                 value={input.password}
-        //                 onChange={changeEventHandler}
-        //                 className='focus-visible:ring-transparent my-2'
-        //             />
-        //         </div>
-
-        //         {
-        //             loading ? (
-        //                 <button>
-        //                     <Loader className='mr-2 h-4 w-4 animate-spin'></Loader>
-        //                 </button>
-        //             ) : (
-        //                 <Button type='submit'>Login</Button>
-        //             )
-        //         }
-
-        //         <span className='text-center'>Don`t have an account ?<Link to='/signup' className='text-blue-600'>SignUp</Link></span>
-        //     </form>
-        // </div>
         <div className="flex w-screen h-screen items-center justify-center bg-gray-100">
             <div className="w-full max-w-md bg-white border border-gray-300 p-10 rounded-xl shadow-sm">
                 {/* Logo & Intro */}

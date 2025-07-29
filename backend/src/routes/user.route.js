@@ -7,7 +7,7 @@ const router=Router()
 
 router.route("/register").post(register)
 router.route("/login").post(login)
-router.route("/logout").get(jwtVerify,logout)//
+router.route("/logout").get(logout)//
 router.route("/:id/profile").get(jwtVerify,GetProfile)
 router.route("/profile/edit").post(jwtVerify,upload.single("profilePhoto"),editprofile)
 router.route('/suggested').get(jwtVerify, getSuggestedUser);
