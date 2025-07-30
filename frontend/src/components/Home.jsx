@@ -16,9 +16,9 @@ function Home() {
   return (
     <>
     <Helmet>
-      <title>Profile | Social Media</title>
+      <title>Home | Social Media</title>
       <meta name="description" content="View and edit your profile on Social Media." />
-      <link rel="canonical" href="https://social-media-es9m.vercel.app/profile" />
+      <link rel="canonical" href="https://social-media-es9m.vercel.app/" />
     </Helmet>
     <div className='flex'>
       <div className='flex-grow'>
