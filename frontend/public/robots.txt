@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://social-media-es9m.vercel.app/sitemap.xml

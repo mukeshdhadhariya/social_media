@@ -5,6 +5,7 @@ import RightSideBar from './RightSideBar'
 import useGetAllPost from '@/hooks/useGetAllPosts'
 import useGetAllSuggestedUser from '@/hooks/useGetAllSuggestedUsers'
 import { useSelector } from 'react-redux'
+import { Helmet } from "react-helmet";
 
 function Home() {
   // const { user } = useSelector(store => store.auth)
@@ -13,6 +14,12 @@ function Home() {
     useGetAllSuggestedUser()
   // }
   return (
+    <>
+    <Helmet>
+      <title>Profile | Social Media</title>
+      <meta name="description" content="View and edit your profile on Social Media." />
+      <link rel="canonical" href="https://social-media-es9m.vercel.app/profile" />
+    </Helmet>
     <div className='flex'>
       <div className='flex-grow'>
         <Feed />
@@ -20,6 +27,7 @@ function Home() {
       </div>
       <RightSideBar />
     </div>
+    </>
   )
 }
 
