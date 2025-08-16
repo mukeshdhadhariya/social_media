@@ -1,45 +1,101 @@
-import React from 'react'
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
-import { Button } from './ui/button'
-import { Link } from 'react-router-dom'
-import { useSelector } from 'react-redux'
-import useGetRTM from '@/hooks/useGetRTM'
-import useGetAllMessage from '@/hooks/useGetAllMessages'
+// import React from 'react'
+// import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
+// import { Button } from './ui/button'
+// import { Link } from 'react-router-dom'
+// import { useSelector } from 'react-redux'
+// import useGetRTM from '@/hooks/useGetRTM'
+// import useGetAllMessage from '@/hooks/useGetAllMessages'
+
+// const Messages = ({ selectedUser }) => {
+    
+//     useGetRTM();
+//     useGetAllMessage();
+//     const {messages} = useSelector(store=>store.chat);
+//     const {user} = useSelector(store=>store.auth);
+//     return (    
+//         <div className='overflow-y-auto flex-1 p-4'>
+//             <div className='flex justify-center'>
+//                 <div className='flex flex-col items-center justify-center'>
+//                     <Avatar className="h-20 w-20">
+//                         <AvatarImage src={selectedUser?.profilePicture} alt='profile' />
+//                         <AvatarFallback className="bg-primary text-white text-sm" >{(selectedUser?.username)?.slice(0,2).toUpperCase()}</AvatarFallback>
+//                     </Avatar>
+//                     <span>{selectedUser?.username}</span>
+//                     <Link to={`/profile/${selectedUser?._id}`}><Button className="h-8 my-2" variant="secondary">View profile</Button></Link>
+//                 </div>
+//             </div>
+//             <div className='flex flex-col gap-3'>
+//                 {
+//                    messages && messages.map((msg) => {
+//                         return (
+//                             <div key={msg._id} className={`flex ${msg.senderId === user?._id ? 'justify-end' : 'justify-start'}`}>
+//                                 <div className={`p-2 rounded-lg max-w-xs break-words ${msg.senderId === user?._id ? 'bg-blue-500 text-white' : 'bg-gray-200 text-black'}`}>
+//                                     {msg.message}
+//                                 </div>
+//                             </div>
+//                         )
+//                     })
+//                 }
+
+//             </div>
+//         </div>  
+//     )
+// }
+
+// export default Messages
+
+import React from 'react';
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
+import { Button } from './ui/button';
+import { Link } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import useGetRTM from '@/hooks/useGetRTM';
+import useGetAllMessage from '@/hooks/useGetAllMessages';
 
 const Messages = ({ selectedUser }) => {
-    
-    useGetRTM();
-    useGetAllMessage();
-    const {messages} = useSelector(store=>store.chat);
-    const {user} = useSelector(store=>store.auth);
-    return (    
-        <div className='overflow-y-auto flex-1 p-4'>
-            <div className='flex justify-center'>
-                <div className='flex flex-col items-center justify-center'>
-                    <Avatar className="h-20 w-20">
-                        <AvatarImage src={selectedUser?.profilePicture} alt='profile' />
-                        <AvatarFallback className="bg-primary text-white text-sm" >{(selectedUser?.username)?.slice(0,2).toUpperCase()}</AvatarFallback>
-                    </Avatar>
-                    <span>{selectedUser?.username}</span>
-                    <Link to={`/profile/${selectedUser?._id}`}><Button className="h-8 my-2" variant="secondary">View profile</Button></Link>
-                </div>
-            </div>
-            <div className='flex flex-col gap-3'>
-                {
-                   messages && messages.map((msg) => {
-                        return (
-                            <div key={msg._id} className={`flex ${msg.senderId === user?._id ? 'justify-end' : 'justify-start'}`}>
-                                <div className={`p-2 rounded-lg max-w-xs break-words ${msg.senderId === user?._id ? 'bg-blue-500 text-white' : 'bg-gray-200 text-black'}`}>
-                                    {msg.message}
-                                </div>
-                            </div>
-                        )
-                    })
-                }
+  useGetRTM();
+  useGetAllMessage();
 
-            </div>
-        </div>  
-    )
-}
+  const { messages } = useSelector(store => store.chat);
+  const { user } = useSelector(store => store.auth);
 
-export default Messages
+  return (
+    <div className="flex flex-col h-full overflow-y-auto px-2 sm:px-4 py-4">
+      {/* User Info */}
+      <div className="flex justify-center mb-4">
+        <div className="flex flex-col items-center">
+          <Avatar className="h-20 w-20">
+            <AvatarImage src={selectedUser?.profilePicture} alt="profile" />
+            <AvatarFallback className="bg-primary text-white text-sm">
+              {(selectedUser?.username || 'U').slice(0, 2).toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
+          <span className="mt-2 font-medium">{selectedUser?.username}</span>
+          <Link to={`/profile/${selectedUser?._id}`}>
+            <Button className="h-8 my-2 w-full sm:w-auto" variant="secondary">
+              View profile
+            </Button>
+          </Link>
+        </div>
+      </div>
+
+      {/* Messages */}
+      <div className="flex flex-col gap-3">
+        {messages && messages.map(msg => (
+          <div
+            key={msg._id}
+            className={`flex ${msg.senderId === user?._id ? 'justify-end' : 'justify-start'}`}
+          >
+            <div className={`p-2 rounded-lg break-words max-w-[75%] sm:max-w-xs 
+              ${msg.senderId === user?._id ? 'bg-blue-500 text-white' : 'bg-gray-200 text-black'}`}
+            >
+              {msg.message}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default Messages;
