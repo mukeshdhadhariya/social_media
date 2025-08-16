@@ -225,7 +225,7 @@ function LeftSideBar() {
 
   const SidebarItem = [
     { icon: <Home />, text: 'Home' },
-    { icon: <Search />, text: 'Search' },
+    { icon: <LogOut />, text: 'Logout' },
     { icon: <TrendingUp />, text: 'Explore' },
     { icon: <MessageCircle />, text: 'Messages' },
     { icon: <Heart />, text: 'Notification' },
@@ -237,7 +237,6 @@ function LeftSideBar() {
       text: 'Profile'
     },
     { icon: <PlusSquare />, text: 'Create' },
-    { icon: <LogOut />, text: 'Logout' },
   ];
 
   const handleClick = (text) => {
