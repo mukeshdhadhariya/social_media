@@ -312,7 +312,7 @@ function Profile() {
               ) : isFollowing ? (
                 <>
                   <Button onClick={FollowUnfollowHandler} variant="secondary" className="h-8 text-sm px-4">Unfollow</Button>
-                  <Button variant="secondary" className="h-8 text-sm px-4">Message</Button>
+                  <Link  to='/chat' variant="secondary" className="h-8 text-sm px-4">Message</Link>
                 </>
               ) : (
                 <Button onClick={FollowUnfollowHandler} className="h-8 text-sm px-6 bg-[#0095F6] hover:bg-[#318ce7] text-white">Follow</Button>
