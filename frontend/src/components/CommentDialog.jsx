@@ -165,6 +165,7 @@ function CommentDialog({ open, setOpen }) {
 
   const [text, setText] = useState('');
   const [comment, setComment] = useState(selectedPost?.comments || []);
+  console.log(comment)
   const API_URL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
