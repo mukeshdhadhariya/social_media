@@ -333,9 +333,9 @@ function Profile() {
             <Badge className="w-fit mx-auto md:mx-0" variant="secondary">
               <AtSign /> <span className="pl-1">{userprofile?.username}</span>
             </Badge>
-            <span>🤯 Learn code with patel mernstack style</span>
-            <span>🤯 Turning code into fun</span>
-            <span>🤯 DM for collaboration</span>
+            <span>tell me about yourself</span>
+            <span>Turning code into fun</span>
+            <span>DM for collaboration</span>
           </div>
         </div>
       </div>
